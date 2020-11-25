@@ -16,6 +16,7 @@ artist_table_drop = "DROP TABLE IF EXISTS artists"
 time_table_drop = "DROP TABLE IF EXISTS time"
 
 # CREATE TABLES
+# Staging stables are in S3.
 
 staging_events_table_create= ("""
     CREATE TABLE IF NOT EXISTS songplays (
@@ -35,7 +36,7 @@ staging_songs_table_create = ("""
 songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplays
     (
-      songplay_id       SERIAL PRIMARY KEY,
+      songplay_id       IDENTITY(0,1) PRIMARY KEY,
       start_time        TIME FOREIGN KEY NOT NULL,
       user_id           INT FOREIGN KEY NOT NULL,
       level             VARCHAR(10) NOT NULL,
@@ -50,7 +51,7 @@ songplay_table_create = ("""
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS users
     (
-      user_id          SERIAL PRIMARY KEY,
+      user_id          IDENTITY(0,1) PRIMARY KEY,
       first_name       VARCHAR(40) NOT NULL,
       last_name        VARCHAR(40) NOT NULL,
       gender           VARCHAR(1) NOT NULL,
