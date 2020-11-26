@@ -7,8 +7,8 @@ config.read('dwh.cfg')
 
 # DROP TABLES
 
-staging_events_table_drop = "DROP TABLE IF EXISTS stg_events"
-staging_songs_table_drop = "DROP TABLE IF EXISTS stg_songs"
+staging_events_table_drop = "DROP TABLE IF EXISTS staging_events"
+staging_songs_table_drop = "DROP TABLE IF EXISTS staging_songs"
 songplay_table_drop = "DROP TABLE IF EXISTS songplays"
 user_table_drop = "DROP TABLE IF EXISTS users"
 song_table_drop = "DROP TABLE IF EXISTS songs"
@@ -19,50 +19,7 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 # Staging stables are in S3.
 
 staging_events_table_create= ("""
-    CREATE TABLE IF NOT EXISTS stg_events 
-    (
-      events_key        IDENTITY(0,1) PRIMARY KEY,
-      start_time        TIME FOREIGN KEY NOT NULL,
-      user_id           INT FOREIGN KEY NOT NULL,
-      level             VARCHAR(10) NOT NULL,
-      song_id           VARCHAR(50) FOREIGN KEY NOT NULL,
-      artist_id         VARCHAR(50) FOREIGN KEY NOT NULL,
-      session_id        VARCHAR(50) FOREIGH KEY NOT NULL,
-      location          VARCHAR,
-      user_agent        VARCHAR NOT NULL,
-      first_name        VARCHAR(40) NOT NULL,
-      last_name         VARCHAR(40) NOT NULL,
-      gender            VARCHAR(1) NOT NULL,
-      level             VARCHAR(10) NOT NULL
-      hour              INT NOT NULL,
-      day               INT NOT NULL,
-      week              INT NOT NULL,
-      month             INT NOT NULL,
-      year              INT NOT NULL,
-      weekday           INT NOT NULL    
-    )
-""")
-
-staging_songs_table_create = ("""
-    CREATE TABLE IF NOT EXISTS stg_songs
-    (
-      num_songs,
-      artist_id
-      artist_latitude,
-      artist_longitude,
-      artist_location,
-      artist_name, 
-      song_id,
-      title,
-      duration,
-      year
-    )
-    
-    
-""")
-
-songplay_table_create = ("""
-    CREATE TABLE IF NOT EXISTS songplays
+    CREATE TABLE IF NOT EXISTS staging_events 
     (
       artist,
       auth,
@@ -81,7 +38,38 @@ songplay_table_create = ("""
       status,
       ts,
       userAgent,
-      userId
+      userId    
+    )
+""")
+
+staging_songs_table_create = ("""
+    CREATE TABLE IF NOT EXISTS staging_songs
+    (
+      num_songs,
+      artist_id
+      artist_latitude,
+      artist_longitude,
+      artist_location,
+      artist_name, 
+      song_id,
+      title,
+      duration,
+      year
+    )   
+""")
+
+songplay_table_create = ("""
+    CREATE TABLE IF NOT EXISTS songplays
+    (
+     songplay_id       IDENTITY(0,1) PRIMARY KEY,
+      start_time        TIME FOREIGN KEY NOT NULL,
+      user_id           INT FOREIGN KEY NOT NULL,
+      level             VARCHAR(10) NOT NULL,
+      song_id           VARCHAR(50) FOREIGN KEY NOT NULL,
+      artist_id         VARCHAR(50) FOREIGN KEY NOT NULL,
+      session_id        VARCHAR(50) FOREIGH KEY NOT NULL,
+      location          VARCHAR,
+      user_agent        VARCHAR NOT NULL
     )
 """)
 
