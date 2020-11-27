@@ -61,7 +61,7 @@ staging_songs_table_create = ("""
 songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplays
     (
-     songplay_id       IDENTITY(0,1) PRIMARY KEY,
+      songplay_id       IDENTITY(0,1) PRIMARY KEY,
       start_time        TIME FOREIGN KEY NOT NULL,
       user_id           INT FOREIGN KEY NOT NULL,
       level             VARCHAR(10) NOT NULL,
@@ -122,26 +122,121 @@ time_table_create = ("""
 # STAGING TABLES
 
 staging_events_copy = ("""
+    INSERT INTO staging_events 
+    ( 
+      artist,
+      auth,
+      firstName,
+      gender,
+      itemInSession,
+      lastName,
+      length,
+      level,
+      location,
+      method,
+      page,
+      registration,
+      sessionId,
+      song,
+      status,
+      ts,
+      userAgent,
+      userId    
+    )
+    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, 
+      %s, %s, %s, %s, %s, %s, %s, %s, %s)
 """).format()
 
 staging_songs_copy = ("""
+    INSERT INTO staging_songs
+    (
+      num_songs,
+      artist_id
+      artist_latitude,
+      artist_longitude,
+      artist_location,
+      artist_name, 
+      song_id,
+      title,
+      duration,
+      year
+    )
+    VALUES(%s, %s, %s, %s, %s, %s,
+      %s, %s, %s, %s)
 """).format()
 
 # FINAL TABLES
 
 songplay_table_insert = ("""
+    INSERT INTO songplays
+    (
+      songplay_id,
+      start_time,
+      user_id,
+      level,
+      song_id,
+      artist_id,
+      session_id,
+      location,
+      user_agent
+    )
+    VALUES(%s, TO_TIMESTAMP(%s), %s, 
+      %s, %s, %s, %s, %s, %s)
+    ON CONFLICT(songplay_id) DO NOTHING
 """)
 
 user_table_insert = ("""
+    INSERT INTO users
+    (
+      user_id,
+      first_name,
+      last_name,
+      gender,
+      level
+    )
+    VALUES(%s, %s, %s, %s, %s)
+    ON CONFLICT(user_id) DO UPDATE SET level=EXCLUDED.level
 """)
 
 song_table_insert = ("""
+    INSERT INTO songs
+    (
+      song_id,
+      title,
+      artist_id,
+      year,
+      duration
+    )
+    VALUES(%s, %s, %s, %s, %s)
+    ON CONFLICT(song_id) DO NOTHING
 """)
 
 artist_table_insert = ("""
+    INSERT INTO artists
+    (
+      artist_id,
+      name,
+      location,
+      latitude,
+      longitude
+    )
+    VALUES(%s, %s, %s, %s, %s)
+    ON CONFLICT(artist_id) DO NOTHING
 """)
 
 time_table_insert = ("""
+    INSERT INTO time
+    (
+      start_time,
+      hour,
+      day,
+      week,
+      month,
+      year,
+      weekday
+    )
+     VALUES(TO_TIMESTAMP(%s), %s, %s, %s,
+       %s, %s, %s)
 """)
 
 # QUERY LISTS
