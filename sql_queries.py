@@ -19,31 +19,29 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 # Staging stables are in S3.
 
 staging_events_table_create= ("""
-    CREATE TABLE IF NOT EXISTS staging_events 
-    (
-      artist,
-      auth,
-      firstName,
-      gender,
-      itemInSession,
-      lastName,
-      length,
-      level,
-      location,
-      method,
-      page,
-      registration,
-      sessionId,
-      song,
-      status,
-      ts,
-      userAgent,
-      userId    
+CREATE TABLE staging_events(artist,
+auth,
+firstName,
+gender,
+itemInSession,
+    lastName,
+    length,
+        level,
+        location,
+        method,
+        page,
+        registration,
+        sessionId,
+        song,
+        status,
+        ts,
+        userAgent,
+        userId    
     )
 """)
 
 staging_songs_table_create = ("""
-    CREATE TABLE IF NOT EXISTS staging_songs
+    CREATE TABLE staging_songs
     (
       num_songs,
       artist_id
@@ -59,7 +57,7 @@ staging_songs_table_create = ("""
 """)
 
 songplay_table_create = ("""
-    CREATE TABLE IF NOT EXISTS songplays
+    CREATE TABLE songplays
     (
       songplay_id       IDENTITY(0,1) PRIMARY KEY,
       start_time        TIME FOREIGN KEY NOT NULL,
@@ -74,7 +72,7 @@ songplay_table_create = ("""
 """)
 
 user_table_create = ("""
-    CREATE TABLE IF NOT EXISTS users
+    CREATE TABLE users
     (
       user_id          IDENTITY(0,1) PRIMARY KEY,
       first_name       VARCHAR(40) NOT NULL,
@@ -85,7 +83,7 @@ user_table_create = ("""
 """)
 
 song_table_create = ("""
-    CREATE TABLE IF NOT EXISTS songs
+    CREATE TABLE songs
     (
       song_id         VARCHAR(50) PRIMARY KEY,
       title           VARCHAR NOT NULL,
@@ -96,7 +94,7 @@ song_table_create = ("""
 """)
 
 artist_table_create = ("""
-    CREATE TABLE IF NOT EXISTS artists
+    CREATE TABLE artists
     (
       artist_id     VARCHAR(50) PRIMARY KEY,
       name          VARCHAR NOT NULL,
@@ -107,7 +105,7 @@ artist_table_create = ("""
 """)
 
 time_table_create = ("""
-    CREATE TABLE IF NOT EXISTS time
+    CREATE TABLE time
     (
       start_time    TIME PRIMARY KEY,
       hour          INT NOT NULL,
