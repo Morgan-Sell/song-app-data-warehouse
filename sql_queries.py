@@ -5,6 +5,10 @@ import configparser
 config = configparser.ConfigParser()
 config.read('dwh.cfg')
 
+DWH_IAM_ROLE_NAME = config.get("IAM_ROLE", "ARN")
+DWH_LOG_DATA = config.get("S3", "LOG_DATA")
+DWH_SONG_DATA = config.get("S3", "SONG_DATA")
+
 # DROP TABLES
 
 staging_events_table_drop = "DROP TABLE IF EXISTS staging_events"
@@ -35,7 +39,7 @@ staging_events_table_create= ("""
         sessionId         INT,
         song              VARCHAR,
         status            INT,
-        ts                NUMERIC,
+        ts                BIGINT,
         userAgent         VARCHAR,
         userId            INT    
     );
@@ -59,13 +63,13 @@ staging_songs_table_create = ("""
 songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplays (
         songplay_id       INT IDENTITY(0,1),
-        start_time        NUMERIC NOT NULL SORTKEY,
-        user_id           INT NOT NULL SORTKEY,
+        start_time        TIMEFORMAT['auto'] NOT NULL SORTKEY,
+        user_id           INT NOT NULL,
         level             VARCHAR(10) NOT NULL DISTKEY,
-        song_id           VARCHAR(50) NOT NULL SORTKEY,
-        artist_id         VARCHAR(50) NOT NULL SORTKEY,
-        session_id        VARCHAR(50) NOT NULL SORTKEY,
-        location          VARCHAR DISTKEY,
+        song_id           VARCHAR(50) NOT NULL,
+        artist_id         VARCHAR(50) NOT NULL,
+        session_id        VARCHAR(50) NOT NULL,
+        location          VARCHAR,
         user_agent        VARCHAR NOT NULL
     );
 """)
@@ -102,13 +106,13 @@ artist_table_create = ("""
 
 time_table_create = ("""
     CREATE TABLE IF NOT EXISTS time (
-        start_time    NUMERIC SORTKEY,
+        start_time    TIMEFORMAT['auto'] SORTKEY,
         hour          INT NOT NULL,
         day           INT NOT NULL,
         week          INT NOT NULL,
-        month         INT NOT NULL DISTKEY,
+        month         INT NOT NULL,
         year          INT NOT NULL DISTKEY,
-        weekday       INT NOT NULL DISTKEY
+        weekday       INT NOT NULL
     );
 """)
 
@@ -118,28 +122,27 @@ staging_events_copy = ("""
     COPY staging_events FROM {}
     CREDENTIALS 'aws_iam_role={}'
     GZIP DELIMITER ';' COMPUPDATE OFF REGION 'us-west-2';
-""").format(LOG_DATA, ARN)
+""").format(DWH_LOG_DATA, DWH_IAM_ROLE_NAME)
 
 staging_songs_copy = ("""
     COPY staging_songs FROM {}
     CREDENTIALS 'aws_iam_role={}'
     GZIP DELIMITER ';' COMPUPDATE OFF REGION 'us-west-2';
-""").format(SONG_DATA, ARN)
+""").format(DWH_SONG_DATA, DWH_IAM_ROLE_NAME)
 
 # FINAL TABLES
 
 songplay_table_insert = ("""
-    INSERT INTO songplays
-    (
-      songplay_id,
-      start_time,
-      user_id,
-      level,
-      song_id,
-      artist_id,
-      session_id,
-      location,
-      user_agent
+    INSERT INTO songplays (
+        songplay_id,
+        start_time,
+        user_id,
+        level,
+        song_id,
+        artist_id,
+        session_id,
+        location,
+        user_agent
     )
     VALUES (%s, TO_TIMESTAMP(%s), %s, 
       %s, %s, %s, %s, %s, %s)
