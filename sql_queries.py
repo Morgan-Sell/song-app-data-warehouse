@@ -20,83 +20,79 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 
 staging_events_table_create= ("""
     CREATE TABLE IF NOT EXISTS staging_events (
-        artist,
-        auth,
-        firstName,
-        gender,
-        itemInSession,
-        lastName,
-        length,
-        level,
-        location,
-        method,
-        page,
-        registration,
-        sessionId,
-        song,
-        status,
-        ts,
-        userAgent,
-        userId    
+        artist            VARCHAR,
+        auth              VARCHAR,
+        firstName         VARCHAR,
+        gender            VARCHAR(1),
+        itemInSession     INT,
+        lastName          VARCHAR(50),
+        length            FLOAT8,
+        level             VARCHAR(10),
+        location          VARCHAR(50),
+        method            VARCHAR(10),
+        page              VARCHAR(25),
+        registration      VARCHAR(50),
+        sessionId         INT,
+        song              VARCHAR,
+        status            INT,
+        ts                NUMERIC,
+        userAgent         VARCHAR,
+        userId            INT    
     );
 """)
 
 staging_songs_table_create = ("""
     CREATE TABLE IF NOT EXISTS staging_songs (
-        num_songs,
-        artist_id
-        arist_latitude,
-        artist_longitude,
-        artist_location,
-        artist_name, 
-        song_id,
-        title,
-        duration,
-        year
+        num_songs         INT,
+        artist_id         VARCHAR,
+        artist_latitude   FLOAT8,
+        artist_longitude  FLOAT8,
+        artist_location   VARCHAR,
+        artist_name       VARCHAR, 
+        song_id           VARCHAR(50),
+        title             VARCHAR,
+        duration          FLOAT8,
+        year              INT
     );   
 """)
 
 songplay_table_create = ("""
-    CREATE TABLE IF NOT EXISTS songplays
-    (
-        songplay_id       IDENTITY(0,1) PRIMARY KEY,
-        start_time        TIME FOREIGN KEY NOT NULL,
-        user_id           INT FOREIGN KEY NOT NULL,
-        level             VARCHAR(10) NOT NULL,
-        song_id           VARCHAR(50) FOREIGN KEY NOT NULL,
-        artist_id         VARCHAR(50) FOREIGN KEY NOT NULL,
-        session_id        VARCHAR(50) FOREIGH KEY NOT NULL,
-        location          VARCHAR,
+    CREATE TABLE IF NOT EXISTS songplays (
+        songplay_id       INT IDENTITY(0,1),
+        start_time        NUMERIC NOT NULL SORTKEY,
+        user_id           INT NOT NULL SORTKEY,
+        level             VARCHAR(10) NOT NULL DISTKEY,
+        song_id           VARCHAR(50) NOT NULL SORTKEY,
+        artist_id         VARCHAR(50) NOT NULL SORTKEY,
+        session_id        VARCHAR(50) NOT NULL SORTKEY,
+        location          VARCHAR DISTKEY,
         user_agent        VARCHAR NOT NULL
     );
 """)
 
 user_table_create = ("""
-    CREATE TABLE IF NOT EXISTS users
-    (
-        user_id          IDENTITY(0,1) PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS users (
+        user_id          INT IDENTITY(0,1) SORTKEY,
         first_name       VARCHAR(40) NOT NULL,
         last_name        VARCHAR(40) NOT NULL,
         gender           VARCHAR(1) NOT NULL,
-        level            VARCHAR(10) NOT NULL
+        level            VARCHAR(10) NOT NULL DISTKEY
     );
 """)
 
 song_table_create = ("""
-    CREATE TABLE IF NOT EXISTS songs
-    (
-        song_id         VARCHAR(50) PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS songs (
+        song_id         VARCHAR(50) SORTKEY,
         title           VARCHAR NOT NULL,
-        artist_id       VARCHAR(50) NOT NULL,
+        artist_id       VARCHAR(50) NOT NULL DISTKEY,
         year            INT NOT NULL,
         duration        NUMERIC NOT NULL
     );
 """)
 
 artist_table_create = ("""
-    CREATE TABLE IF NOT EXISTS artists
-    (
-        artist_id     VARCHAR(50) PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS artists (
+        artist_id     VARCHAR(50) SORTKEY,
         name          VARCHAR NOT NULL,
         location      VARCHAR NOT NULL,
         latitude      FLOAT8,
@@ -106,61 +102,29 @@ artist_table_create = ("""
 
 time_table_create = ("""
     CREATE TABLE IF NOT EXISTS time (
-        start_time    TIME PRIMARY KEY,
+        start_time    NUMERIC SORTKEY,
         hour          INT NOT NULL,
         day           INT NOT NULL,
         week          INT NOT NULL,
-        month         INT NOT NULL,
-        year          INT NOT NULL,
-        weekday       INT NOT NULL
+        month         INT NOT NULL DISTKEY,
+        year          INT NOT NULL DISTKEY,
+        weekday       INT NOT NULL DISTKEY
     );
 """)
 
 # STAGING TABLES
 
 staging_events_copy = ("""
-    INSERT INTO staging_events 
-    ( 
-      artist,
-      auth,
-      firstName,
-      gender,
-      itemInSession,
-      lastName,
-      length,
-      level,
-      location,
-      method,
-      page,
-      registration,
-      sessionId,
-      song,
-      status,
-      ts,
-      userAgent,
-      userId    
-    )
-    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, 
-      %s, %s, %s, %s, %s, %s, %s, %s, %s);
-""").format()
+    COPY staging_events FROM {}
+    CREDENTIALS 'aws_iam_role={}'
+    GZIP DELIMITER ';' COMPUPDATE OFF REGION 'us-west-2';
+""").format(LOG_DATA, ARN)
 
 staging_songs_copy = ("""
-    INSERT INTO staging_songs
-    (
-      num_songs,
-      artist_id
-      artist_latitude,
-      artist_longitude,
-      artist_location,
-      artist_name, 
-      song_id,
-      title,
-      duration,
-      year
-    )
-    VALUES(%s, %s, %s, %s, %s, %s,
-      %s, %s, %s, %s);
-""").format()
+    COPY staging_songs FROM {}
+    CREDENTIALS 'aws_iam_role={}'
+    GZIP DELIMITER ';' COMPUPDATE OFF REGION 'us-west-2';
+""").format(SONG_DATA, ARN)
 
 # FINAL TABLES
 
@@ -177,7 +141,7 @@ songplay_table_insert = ("""
       location,
       user_agent
     )
-    VALUES(%s, TO_TIMESTAMP(%s), %s, 
+    VALUES (%s, TO_TIMESTAMP(%s), %s, 
       %s, %s, %s, %s, %s, %s)
     ON CONFLICT(songplay_id) DO NOTHING;
 """)
@@ -191,7 +155,7 @@ user_table_insert = ("""
       gender,
       level
     )
-    VALUES(%s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s)
     ON CONFLICT(user_id) DO UPDATE SET level=EXCLUDED.level;
 """)
 
@@ -217,7 +181,7 @@ artist_table_insert = ("""
       latitude,
       longitude
     )
-    VALUES(%s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s)
     ON CONFLICT(artist_id) DO NOTHING;
 """)
 
@@ -232,7 +196,7 @@ time_table_insert = ("""
       year,
       weekday
     )
-     VALUES(TO_TIMESTAMP(%s), %s, %s, %s,
+     VALUES (TO_TIMESTAMP(%s), %s, %s, %s,
        %s, %s, %s);
 """)
 
