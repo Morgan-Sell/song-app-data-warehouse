@@ -8,6 +8,7 @@ config.read('dwh.cfg')
 DWH_IAM_ROLE_NAME = config.get("IAM_ROLE", "ARN")
 DWH_LOG_DATA = config.get("S3", "LOG_DATA")
 DWH_SONG_DATA = config.get("S3", "SONG_DATA")
+DWH_LOG_JSONPATH = config.get("S3", "LOG_JSONPATH")
 
 # DROP TABLES
 
@@ -27,15 +28,15 @@ staging_events_table_create= ("""
         artist            VARCHAR,
         auth              VARCHAR,
         firstName         VARCHAR,
-        gender            VARCHAR(1),
+        gender            VARCHAR,
         itemInSession     INT,
-        lastName          VARCHAR(50),
+        lastName          VARCHAR,
         length            FLOAT8,
-        level             VARCHAR(10),
-        location          VARCHAR(50),
-        method            VARCHAR(10),
-        page              VARCHAR(25),
-        registration      VARCHAR(50),
+        level             VARCHAR,
+        location          VARCHAR,
+        method            VARCHAR,
+        page              VARCHAR,
+        registration      VARCHAR,
         sessionId         INT,
         song              VARCHAR,
         status            INT,
@@ -53,7 +54,7 @@ staging_songs_table_create = ("""
         artist_longitude  FLOAT8,
         artist_location   VARCHAR,
         artist_name       VARCHAR, 
-        song_id           VARCHAR(50),
+        song_id           VARCHAR,
         title             VARCHAR,
         duration          FLOAT8,
         year              INT
@@ -63,12 +64,12 @@ staging_songs_table_create = ("""
 songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplays (
         songplay_id       INT IDENTITY(0,1),
-        start_time        TIMEFORMAT['auto'] NOT NULL SORTKEY,
+        start_time        TIMESTAMP NOT NULL SORTKEY,
         user_id           INT NOT NULL,
-        level             VARCHAR(10) NOT NULL DISTKEY,
-        song_id           VARCHAR(50) NOT NULL,
-        artist_id         VARCHAR(50) NOT NULL,
-        session_id        VARCHAR(50) NOT NULL,
+        level             VARCHAR NOT NULL DISTKEY,
+        song_id           VARCHAR NOT NULL,
+        artist_id         VARCHAR NOT NULL,
+        session_id        VARCHAR NOT NULL,
         location          VARCHAR,
         user_agent        VARCHAR NOT NULL
     );
@@ -77,18 +78,18 @@ songplay_table_create = ("""
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS users (
         user_id          INT IDENTITY(0,1) SORTKEY,
-        first_name       VARCHAR(40) NOT NULL,
-        last_name        VARCHAR(40) NOT NULL,
-        gender           VARCHAR(1) NOT NULL,
-        level            VARCHAR(10) NOT NULL DISTKEY
+        first_name       VARCHAR NOT NULL,
+        last_name        VARCHAR NOT NULL,
+        gender           VARCHAR NOT NULL,
+        level            VARCHAR NOT NULL DISTKEY
     );
 """)
 
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS songs (
-        song_id         VARCHAR(50) SORTKEY,
+        song_id         VARCHAR SORTKEY,
         title           VARCHAR NOT NULL,
-        artist_id       VARCHAR(50) NOT NULL DISTKEY,
+        artist_id       VARCHAR NOT NULL DISTKEY,
         year            INT NOT NULL,
         duration        NUMERIC NOT NULL
     );
@@ -96,7 +97,7 @@ song_table_create = ("""
 
 artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS artists (
-        artist_id     VARCHAR(50) SORTKEY,
+        artist_id     VARCHAR SORTKEY,
         name          VARCHAR NOT NULL,
         location      VARCHAR NOT NULL,
         latitude      FLOAT8,
@@ -106,7 +107,7 @@ artist_table_create = ("""
 
 time_table_create = ("""
     CREATE TABLE IF NOT EXISTS time (
-        start_time    TIMEFORMAT['auto'] SORTKEY,
+        start_time    TIMESTAMP SORTKEY,
         hour          INT NOT NULL,
         day           INT NOT NULL,
         week          INT NOT NULL,
@@ -121,13 +122,15 @@ time_table_create = ("""
 staging_events_copy = ("""
     COPY staging_events FROM {}
     CREDENTIALS 'aws_iam_role={}'
-    GZIP DELIMITER ';' COMPUPDATE OFF REGION 'us-west-2';
-""").format(DWH_LOG_DATA, DWH_IAM_ROLE_NAME)
+    JSON {} 
+    COMPUPDATE OFF REGION 'us-west-2';
+""").format(DWH_LOG_DATA, DWH_IAM_ROLE_NAME, DWH_LOG_JSONPATH)
 
 staging_songs_copy = ("""
     COPY staging_songs FROM {}
     CREDENTIALS 'aws_iam_role={}'
-    GZIP DELIMITER ';' COMPUPDATE OFF REGION 'us-west-2';
+    JSON 'auto'
+    COMPUPDATE OFF REGION 'us-west-2';
 """).format(DWH_SONG_DATA, DWH_IAM_ROLE_NAME)
 
 # FINAL TABLES
