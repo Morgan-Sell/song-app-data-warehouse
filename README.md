@@ -1,4 +1,4 @@
-# Sparkify's Data Warehouse Cloud Tranformation
+# Sparkify's Data Warehouse Cloud Transformation
 ## ETL Pipeline Enabling Music Startup to Manage and Analyze Data on AWS
 
 <img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/music_data.png" width="800" height="250">
@@ -7,7 +7,16 @@
 Sparkify, a **fake** streaming music app that was launched during the COVID-19 pandemic, experienced exponential growth and required a scalable and computationally efficient data analytics solution. As such, the company decided to adopt Amazon Web Services (AWS) and host its database on Redshift.
 
 # Data Warehouse Design
-To enhance the efficiency of the ETL process and ensure data quality, I implemented a **staging area** comprised of two tables that mirror the data sources: (1) metadata of songs/artists available on Sparkity and (2) played song events. The format of both datasets are JSON.
+To enhance the efficiency of the ETL process and ensure data quality, I implemented a **staging area** comprised of two tables that mirror the data sources: (1) metadata of songs/artists available on Sparkify and (2) played song events. The format of both datasets are JSON and are stored in AWS's S3.
+
+The architecture used in this project is commonly referred to as "Kimball's Bus Architecture" named in recognize of Ralph Kimball, one of the godfathers of data warehousing. The principal concept of Bus Architecture is the use of conformed dimensions meaning a data warehouse structure that can be used by all business units within an enterprise.
+
+Note the naming of "backroom" and "frontroom". The back room is where the data is transformed/process. The end user, i.e. data analyst, does not have access to these tables. On the other hand, a data analyst can directly query from the tables located in the front room. A common analogy is a resturant's kitchen (backroom) and dining area (frontroom).
+
+<img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/dwh_design.png" width="500" height="150" class="center">
+    
+    
+Sparkify kept
 
 
 
