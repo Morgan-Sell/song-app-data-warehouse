@@ -147,8 +147,7 @@ songplay_table_insert = ("""
         location,
         user_agent
     )
-    VALUES (%s, TO_TIMESTAMP(%s), %s, 
-      %s, %s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT(songplay_id) DO NOTHING;
 """)
 
@@ -202,8 +201,7 @@ time_table_insert = ("""
       year,
       weekday
     )
-     VALUES (TO_TIMESTAMP(%s), %s, %s, %s,
-       %s, %s, %s);
+     VALUES (%s, %s, %s, %s, %s, %s, %s);
 """)
 
 # QUERY LISTS
