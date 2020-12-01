@@ -146,9 +146,19 @@ songplay_table_insert = ("""
         session_id,
         location,
         user_agent
-    ) \
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-    ON CONFLICT(songplay_id) DO NOTHING;
+    ); 
+    SELECT
+        se.ts,
+        se.userId,
+        se.level,
+        ss.song_id,
+        ss.artist_id,
+        se.sessionId,
+        se.location,
+        se.userAgent
+    FROM staging_events se
+        LEFT JOIN staging_songs
+            ON se.song = ss.title;
 """)
 
 user_table_insert = ("""
@@ -159,9 +169,14 @@ user_table_insert = ("""
       last_name,
       gender,
       level
-    ) \
-    VALUES (%s, %s, %s, %s, %s)
-    ON CONFLICT(user_id) DO UPDATE SET level=EXCLUDED.level;
+    );
+    SELECT
+        userId,
+        firstName,
+        lastName,
+        gender,
+        level
+    FROM 
 """)
 
 song_table_insert = ("""
@@ -210,3 +225,8 @@ create_table_queries = [staging_events_table_create, staging_songs_table_create,
 drop_table_queries = [staging_events_table_drop, staging_songs_table_drop, songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
 copy_table_queries = [staging_events_copy, staging_songs_copy]
 insert_table_queries = [songplay_table_insert, user_table_insert, song_table_insert, artist_table_insert, time_table_insert]
+insert_table_attributes = [(songplay_id, start_time, user_id, level, song_id, artist_id, session_id, location, user_agent),
+                          (user_id, first_name, last_name, gender, level),
+                          (song_id, title, artist_id, year, duration),
+                          (artist_id, name, location, latitude, longitude),
+                          (start_time, hour, day, week, month, year, weekday)]
