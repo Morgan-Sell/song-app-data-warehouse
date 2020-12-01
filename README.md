@@ -18,5 +18,18 @@ Note the naming of "backroom" and "frontroom". The back room is where the data i
     
 The tables and database are stored on AWS Redshift, which also provides a query editor, enabling analytics.
 
+## Optimize Table Design
 
+As mentioned, Sparkify has experienced extraordinary growth and expects for it to continue. Consequently, I expect the cost of queries to increase significantly. To mitigitate this risk, I implemented distribution keys on a couple of the tables.
+
+The distribution key determines how the data is partitioned across the various machines/vCPUS. The idea is to predict how analysts may group/analyze the data. The table below lists the respective tables and their corresponding distribution keys.
+
+
+<center><img="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/table_dist_key.png" width="400" height="150"></center>
+
+
+Based on this structure, the "**users**" we will be partitioned into two nodes that correspond with a free or premium membership. It is common for Sparkify's analysts to apply different methods when analyzing these two groups.
+
+
+# ETL Pipeline
 

@@ -145,9 +145,16 @@ songplay_table_insert = ("""
         session_id,
         location,
         user_agent
-    ) 
+    )
+    WITH start_timestamp AS (
+        SELECT
+                TIMESTAMP 'epoch' + ts/1000 * INTERVAL '1 second' AS start_time,
+                sessionId,
+                itemInSession
+            FROM staging_events
+    )
     SELECT
-        se.ts,
+        st.start_time,
         se.userId,
         se.level,
         ss.song_id,
@@ -157,7 +164,10 @@ songplay_table_insert = ("""
         se.userAgent
     FROM staging_events se
         LEFT JOIN staging_songs ss
-            ON se.song = ss.title;
+            ON se.song = ss.title
+        LEFT JOIN start_timestamp st
+            ON se.sessionId = st.sessionId
+            AND se.itemInSession = st.itemInSession;
 """)
 
 user_table_insert = ("""
@@ -168,14 +178,15 @@ user_table_insert = ("""
       last_name,
       gender,
       level
-    )
+    )    
     SELECT
         userId,
         firstName,
         lastName,
         gender,
         level
-    FROM staging_events;
+    FROM staging_events
+    WHERE userId IS NOT NULL;
 """)
 
 song_table_insert = ("""
@@ -193,7 +204,8 @@ song_table_insert = ("""
         artist_id,
         year,
         duration
-    FROM staging_songs;
+    FROM staging_songs
+    WHERE song_id IS NOT NULL;
 """)
 
 artist_table_insert = ("""
@@ -226,16 +238,16 @@ time_table_insert = ("""
       weekday
     )
     SELECT
-        sub.start_time,
-        EXTRACT(HOUR FROM sub.start_time),
-        EXTRACT(DAY FROM sub.start_time),
-        EXTRACT(WEEK FROM sub.start_time),
-        EXTRACT(MONTH FROM sub.start_time),
-        EXTRACT(YEAR FROM sub.start_time)
-        FROM (SELECT
-                TIMESTAMP 'epoch' + start_time/1000 * INTERVAL '1 second' AS start_time
-            FROM songplays) sub;       
+        start_time,
+        EXTRACT(HOUR FROM start_time),
+        EXTRACT(DAY FROM start_time),
+        EXTRACT(WEEK FROM start_time),
+        EXTRACT(MONTH FROM start_time),
+        EXTRACT(YEAR FROM start_time)
+        FROM songplays;       
 """)
+
+# The above subquery transforms a BIGINT into a TIMESTAMP.
 
 # QUERY LISTS
 
