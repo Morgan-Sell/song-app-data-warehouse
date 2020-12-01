@@ -1,6 +1,6 @@
 import configparser
 import psycopg2
-from sql_queries import copy_table_queries, insert_table_queries, insert_table_attributes
+from sql_queries import copy_table_queries, insert_table_queries
 
 
 def load_staging_tables(cur, conn):
@@ -10,7 +10,7 @@ def load_staging_tables(cur, conn):
 
 
 def insert_tables(cur, conn):
-    for query, attributes in zip(insert_table_queries, insert_table_attributes):
+    for query in insert_table_queries:
         cur.execute(query)
         conn.commit()
 

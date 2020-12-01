@@ -13,7 +13,7 @@ The architecture used in this project is commonly referred to as "Kimball's Bus 
 
 Note the naming of "backroom" and "frontroom". The back room is where the data is transformed/process. The end user, i.e. data analyst, does not have access to these tables. On the other hand, a data analyst can directly query from the tables located in the front room. A common analogy is a resturant's kitchen (backroom) and dining area (frontroom).
 
-![DWH Design](https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/dwh_design.png=650x175)
+![DWH Design](https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/dwh_design.png)
     
     
 Sparkify kept
