@@ -1,7 +1,7 @@
 # Sparkify's Data Warehouse Cloud Transformation
 ## ETL Pipeline Enabling Music Startup to Manage and Analyze Data on AWS
 
-<img="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/music_data.png" width="800" height="250">
+<img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/music_data.png" width="800" height="250">
 
 # Objective
 Sparkify, a **fake** streaming music app that was launched during the COVID-19 pandemic, experienced exponential growth and required a scalable and computationally efficient data analytics solution. As such, the company decided to adopt Amazon Web Services (AWS) and host its database on Redshift.
@@ -25,7 +25,7 @@ As mentioned, Sparkify has experienced extraordinary growth and expects for it t
 The distribution key determines how the data is partitioned across the various machines/vCPUS. The idea is to predict how analysts may group/analyze the data. The table below lists the respective tables and their corresponding distribution keys.
 
 
-<center><img="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/table_dist_key.png" width="400" height="150"></center>
+<center><img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/table_dist_key.png" width="400" height="150"></center>
 
 
 Based on this structure, the "**users**" we will be partitioned into two nodes that correspond with a free or premium membership. It is common for Sparkify's analysts to apply different methods when analyzing these two groups.
