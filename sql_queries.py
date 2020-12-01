@@ -152,6 +152,7 @@ songplay_table_insert = ("""
                 sessionId,
                 itemInSession
             FROM staging_events
+            WHERE ts is NOT NULL
     )
     SELECT
         st.start_time,
@@ -167,7 +168,12 @@ songplay_table_insert = ("""
             ON se.song = ss.title
         LEFT JOIN start_timestamp st
             ON se.sessionId = st.sessionId
-            AND se.itemInSession = st.itemInSession;
+            AND se.itemInSession = st.itemInSession
+    WHERE se.userId IS NOT NULL
+        AND ss.artist_id IS NOT NULL
+        AND se.level IS NOT NULL
+        AND se.sessionId IS NOT NULL
+        AND se.userAgent IS NOT NULL
 """)
 
 user_table_insert = ("""
@@ -223,7 +229,8 @@ artist_table_insert = ("""
         artist_location,
         artist_latitude,
         artist_longitude
-    FROM staging_songs;
+    FROM staging_songs
+    WHERE artist_id IS NOT NULL
 """)
 
 time_table_insert = ("""

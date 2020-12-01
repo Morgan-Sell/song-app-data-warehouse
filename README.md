@@ -25,11 +25,14 @@ As mentioned, Sparkify has experienced extraordinary growth and expects for it t
 The distribution key determines how the data is partitioned across the various machines/vCPUS. The idea is to predict how analysts may group/analyze the data. The table below lists the respective tables and their corresponding distribution keys.
 
 
-<center><img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/table_dist_key.png" width="400" height="150"></center>
+<center><img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/table_dist_key.png" alt="Dist Key Table" width="400" height="225"></center>
 
 
 Based on this structure, the "**users**" we will be partitioned into two nodes that correspond with a free or premium membership. It is common for Sparkify's analysts to apply different methods when analyzing these two groups.
 
 
 # ETL Pipeline
-
+1. Execute `create_tables.py` to create connection with the provided Redshift cluster.
+2, Erase existing staging, dimension and facts tables and create new ones of each table.
+2. Run `etl.py` 
+3. 
