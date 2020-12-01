@@ -1,7 +1,7 @@
 # Sparkify's Data Warehouse Cloud Transformation
 ## ETL Pipeline Enabling Music Startup to Manage and Analyze Data on AWS
 
-![Music and Bytes](https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/music_data.png=800x250)
+<img="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/music_data.png" width="800" height="250">
 
 # Objective
 Sparkify, a **fake** streaming music app that was launched during the COVID-19 pandemic, experienced exponential growth and required a scalable and computationally efficient data analytics solution. As such, the company decided to adopt Amazon Web Services (AWS) and host its database on Redshift.
@@ -16,7 +16,7 @@ Note the naming of "backroom" and "frontroom". The back room is where the data i
 ![DWH Design](https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/dwh_design.png)
     
     
-Sparkify kept
+The tables and database are stored on AWS Redshift, which also provides a query editor, enabling analytics.
 
 
 

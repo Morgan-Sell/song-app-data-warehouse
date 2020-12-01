@@ -137,7 +137,6 @@ staging_songs_copy = ("""
 
 songplay_table_insert = ("""
     INSERT INTO songplays (
-        songplay_id,
         start_time,
         user_id,
         level,
@@ -148,7 +147,6 @@ songplay_table_insert = ("""
         user_agent
     ) 
     SELECT
-        DEFAULT,
         se.ts,
         se.userId,
         se.level,
@@ -158,7 +156,7 @@ songplay_table_insert = ("""
         se.location,
         se.userAgent
     FROM staging_events se
-        LEFT JOIN staging_songs
+        LEFT JOIN staging_songs ss
             ON se.song = ss.title;
 """)
 
@@ -228,7 +226,15 @@ time_table_insert = ("""
       weekday
     )
     SELECT
-        
+        sub.start_time,
+        EXTRACT(HOUR FROM sub.start_time),
+        EXTRACT(DAY FROM sub.start_time),
+        EXTRACT(WEEK FROM sub.start_time),
+        EXTRACT(MONTH FROM sub.start_time),
+        EXTRACT(YEAR FROM sub.start_time)
+        FROM (SELECT
+                TIMESTAMP 'epoch' + start_time/1000 * INTERVAL '1 second' AS start_time
+            FROM songplays) sub;       
 """)
 
 # QUERY LISTS
