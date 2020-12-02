@@ -77,10 +77,10 @@ songplay_table_create = ("""
 
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS users (
-        user_id          INT IDENTITY(0,1) SORTKEY,
-        first_name       VARCHAR NOT NULL,
-        last_name        VARCHAR NOT NULL,
-        gender           VARCHAR NOT NULL,
+        user_id          INT SORTKEY,
+        first_name       VARCHAR,
+        last_name        VARCHAR,
+        gender           VARCHAR,
         level            VARCHAR NOT NULL DISTKEY
     );
 """)
@@ -90,8 +90,8 @@ song_table_create = ("""
         song_id         VARCHAR SORTKEY,
         title           VARCHAR NOT NULL,
         artist_id       VARCHAR NOT NULL DISTKEY,
-        year            INT NOT NULL,
-        duration        NUMERIC NOT NULL
+        year            INT,
+        duration        NUMERIC
     );
 """)
 
@@ -99,7 +99,7 @@ artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS artists (
         artist_id     VARCHAR SORTKEY,
         name          VARCHAR NOT NULL,
-        location      VARCHAR NOT NULL,
+        location      VARCHAR,
         latitude      FLOAT8,
         longitude     FLOAT8
     );
@@ -173,7 +173,7 @@ songplay_table_insert = ("""
         AND ss.artist_id IS NOT NULL
         AND se.level IS NOT NULL
         AND se.sessionId IS NOT NULL
-        AND se.userAgent IS NOT NULL
+        AND se.userAgent IS NOT NULL;
 """)
 
 user_table_insert = ("""
@@ -192,7 +192,8 @@ user_table_insert = ("""
         gender,
         level
     FROM staging_events
-    WHERE userId IS NOT NULL;
+    WHERE userId IS NOT NULL
+        AND level IS NOT NULL;
 """)
 
 song_table_insert = ("""
@@ -203,7 +204,7 @@ song_table_insert = ("""
       artist_id,
       year,
       duration
-    );
+    )
     SELECT
         song_id,
         title,
@@ -211,7 +212,9 @@ song_table_insert = ("""
         year,
         duration
     FROM staging_songs
-    WHERE song_id IS NOT NULL;
+    WHERE song_id IS NOT NULL
+        AND title IS NOT NULL
+        AND artist_id IS NOT NULL;
 """)
 
 artist_table_insert = ("""
@@ -231,6 +234,7 @@ artist_table_insert = ("""
         artist_longitude
     FROM staging_songs
     WHERE artist_id IS NOT NULL
+        AND artist_name is NOT NULL;
 """)
 
 time_table_insert = ("""
@@ -251,7 +255,8 @@ time_table_insert = ("""
         EXTRACT(WEEK FROM start_time),
         EXTRACT(MONTH FROM start_time),
         EXTRACT(YEAR FROM start_time)
-        FROM songplays;       
+    FROM songplays
+        WHERE start_time IS NOT NULL;
 """)
 
 # The above subquery transforms a BIGINT into a TIMESTAMP.

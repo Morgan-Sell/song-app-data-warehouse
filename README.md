@@ -25,14 +25,26 @@ As mentioned, Sparkify has experienced extraordinary growth and expects for it t
 The distribution key determines how the data is partitioned across the various machines/vCPUS. The idea is to predict how analysts may group/analyze the data. The table below lists the respective tables and their corresponding distribution keys.
 
 
-<center><img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/table_dist_key.png" alt="Dist Key Table" width="400" height="225"></center>
+<center><img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/table_dist_key.png" alt="Dist Key Table" width="500" height="200"></center>
 
 
 Based on this structure, the "**users**" we will be partitioned into two nodes that correspond with a free or premium membership. It is common for Sparkify's analysts to apply different methods when analyzing these two groups.
 
+Also, in some tables, I labeled certain attributes as **sorting keys**. Before being allocating to different nodes/vCPUs the table is sorted by the **sorting key**. Consequently, rows are organized in contiguous ranges, determined by the sorting key, and organized accordingly across the nodes. Applying this design will decrease query time in some analyses. It's quite helpful w/ computational efficiency when a query includes an **ORDER BY**.
+
+<center><img src="https://github.com/Morgan-Sell/song-app-data-warehouse/blob/main/img/table_sort_key.png" alt="Sort Key Table" width="500" height="200"></center>
+
 
 # ETL Pipeline
-1. Execute `create_tables.py` to create connection with the provided Redshift cluster.
-2, Erase existing staging, dimension and facts tables and create new ones of each table.
-2. Run `etl.py` 
-3. 
+1. Create/reactivat a Redshift Cluster
+2. Execute `create_tables.py` to create connection with the provided Redshift clusterh
+3. Erase existing staging, dimension and facts tables and create new ones of each table.
+4. Run `etl.py` to load the data from S3 to staging tables.
+5. Exports data from staging tables to facts and dimnsion tables.
+6. Perform analysis using AWS Redshift.
+
+
+
+# Packages
+- Psycopg2
+- ConfigParser
