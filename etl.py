@@ -4,12 +4,19 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 
 def load_staging_tables(cur, conn):
+    """
+    Copies data in S3 bucket to database in Redshift cluster.
+    """
     for query in copy_table_queries:
         cur.execute(query)
         conn.commit()
 
 
 def insert_tables(cur, conn):
+    """
+    Queries data from staging tables.
+    Inserts the data into the respective facts/dimension tables.
+    """
     for query in insert_table_queries:
         cur.execute(query)
         conn.commit()
