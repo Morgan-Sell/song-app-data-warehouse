@@ -71,7 +71,7 @@ songplay_table_create = ("""
         artist_id         VARCHAR NOT NULL,
         session_id        VARCHAR NOT NULL,
         location          VARCHAR,
-        user_agent        VARCHAR NOT NULL
+        user_agent        VARCHAR
     );
 """)
 
@@ -146,16 +146,8 @@ songplay_table_insert = ("""
         location,
         user_agent
     )
-    WITH start_timestamp AS (
-        SELECT
-                TIMESTAMP 'epoch' + ts/1000 * INTERVAL '1 second' AS start_time,
-                sessionId,
-                itemInSession
-            FROM staging_events
-            WHERE ts is NOT NULL
-    )
     SELECT
-        st.start_time,
+        (TIMESTAMP 'epoch' + se.ts/1000*INTERVAL '1 second') AS start_time,
         se.userId,
         se.level,
         ss.song_id,
@@ -166,14 +158,12 @@ songplay_table_insert = ("""
     FROM staging_events se
         LEFT JOIN staging_songs ss
             ON se.song = ss.title
-        LEFT JOIN start_timestamp st
-            ON se.sessionId = st.sessionId
-            AND se.itemInSession = st.itemInSession
     WHERE se.userId IS NOT NULL
         AND ss.artist_id IS NOT NULL
         AND se.level IS NOT NULL
         AND se.sessionId IS NOT NULL
-        AND se.userAgent IS NOT NULL;
+        AND ss.song_id IS NOT NULL
+        AND se.ts IS NOT NULL;
 """)
 
 user_table_insert = ("""
@@ -254,9 +244,12 @@ time_table_insert = ("""
         EXTRACT(DAY FROM start_time),
         EXTRACT(WEEK FROM start_time),
         EXTRACT(MONTH FROM start_time),
-        EXTRACT(YEAR FROM start_time)
-    FROM songplays
-        WHERE start_time IS NOT NULL;
+        EXTRACT(YEAR FROM start_time),
+        EXTRACT(WEEKDAY FROM start_time)
+    FROM (SELECT
+            TIMESTAMP 'epoch' + ts/1000*INTERVAL '1 second' AS start_time
+        FROM staging_events
+            WHERE ts IS NOT NULL) sub;
 """)
 
 # The above subquery transforms a BIGINT into a TIMESTAMP.
