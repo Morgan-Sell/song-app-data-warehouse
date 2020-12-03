@@ -165,7 +165,9 @@ songplay_table_insert = ("""
         AND se.level IS NOT NULL
         AND se.sessionId IS NOT NULL
         AND ss.song_id IS NOT NULL
-        AND se.ts IS NOT NULL;
+        AND se.ts IS NOT NULL
+        AND se.sessionId NOT IN (SELECT DISTINCT session_id FROM songplays)
+        AND se.page = 'NextSong';
 """)
 
 # Excludes additional WHERE clasuse, i.e. "ON CONFLICT" equivalent
@@ -187,7 +189,8 @@ user_table_insert = ("""
         level
     FROM staging_events
     WHERE userId IS NOT NULL
-        AND level IS NOT NULL;
+        AND level IS NOT NULL
+        AND userId NOT IN (SELECT DISTINCT user_id FROM users);
 """)
 
 song_table_insert = ("""
