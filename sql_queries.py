@@ -166,6 +166,8 @@ songplay_table_insert = ("""
         AND se.ts IS NOT NULL;
 """)
 
+# Excludes additional WHERE clasuse, i.e. "ON CONFLICT" equivalent
+# A user may change from "free" to "paid" membership.
 user_table_insert = ("""
     INSERT INTO users
     (
@@ -176,7 +178,7 @@ user_table_insert = ("""
       level
     )    
     SELECT
-        userId,
+        DISTINCT userId,
         firstName,
         lastName,
         gender,
@@ -196,7 +198,7 @@ song_table_insert = ("""
       duration
     )
     SELECT
-        song_id,
+        DISTINCT song_id,
         title,
         artist_id,
         year,
@@ -204,7 +206,8 @@ song_table_insert = ("""
     FROM staging_songs
     WHERE song_id IS NOT NULL
         AND title IS NOT NULL
-        AND artist_id IS NOT NULL;
+        AND artist_id IS NOT NULL
+        AND song_id NOT IN (SELECT DISTINCT song_id FROM songs);
 """)
 
 artist_table_insert = ("""
@@ -224,7 +227,9 @@ artist_table_insert = ("""
         artist_longitude
     FROM staging_songs
     WHERE artist_id IS NOT NULL
-        AND artist_name is NOT NULL;
+        AND artist_name is NOT NULL
+        AND artist_id NOT IN (SELECT DISTINCT artist_id FROM artists);
+    
 """)
 
 time_table_insert = ("""
