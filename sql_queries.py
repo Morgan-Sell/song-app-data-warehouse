@@ -63,7 +63,7 @@ staging_songs_table_create = ("""
 
 songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplays (
-        songplay_id       INT IDENTITY(0,1),
+        songplay_id       INT IDENTITY(0,1) PRIMARY KEY,
         start_time        TIMESTAMP NOT NULL SORTKEY,
         user_id           INT NOT NULL,
         level             VARCHAR NOT NULL DISTKEY,
@@ -77,7 +77,7 @@ songplay_table_create = ("""
 
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS users (
-        user_id          INT SORTKEY,
+        user_id          INT SORTKEY PRIMARY KEY,
         first_name       VARCHAR,
         last_name        VARCHAR,
         gender           VARCHAR,
@@ -87,7 +87,7 @@ user_table_create = ("""
 
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS songs (
-        song_id         VARCHAR SORTKEY,
+        song_id         VARCHAR SORTKEY PRIMARY KEY,
         title           VARCHAR NOT NULL,
         artist_id       VARCHAR NOT NULL DISTKEY,
         year            INT,
@@ -97,7 +97,7 @@ song_table_create = ("""
 
 artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS artists (
-        artist_id     VARCHAR SORTKEY,
+        artist_id     VARCHAR SORTKEY PRIMARY KEY,
         name          VARCHAR NOT NULL,
         location      VARCHAR,
         latitude      FLOAT8,
@@ -107,7 +107,7 @@ artist_table_create = ("""
 
 time_table_create = ("""
     CREATE TABLE IF NOT EXISTS time (
-        start_time    TIMESTAMP SORTKEY,
+        start_time    TIMESTAMP SORTKEY PRIMARY KEY,
         hour          INT NOT NULL,
         day           INT NOT NULL,
         week          INT NOT NULL,
@@ -158,6 +158,8 @@ songplay_table_insert = ("""
     FROM staging_events se
         LEFT JOIN staging_songs ss
             ON se.song = ss.title
+            AND se.artist = ss.artist_name
+            AND se.length = ss.duration
     WHERE se.userId IS NOT NULL
         AND ss.artist_id IS NOT NULL
         AND se.level IS NOT NULL
@@ -220,7 +222,7 @@ artist_table_insert = ("""
       longitude
     )
     SELECT
-        artist_id,
+        DISTINCT artist_id,
         artist_name,
         artist_location,
         artist_latitude,
