@@ -249,7 +249,7 @@ time_table_insert = ("""
       weekday
     )
     SELECT
-        start_time,
+        DISTINCT start_time,
         EXTRACT(HOUR FROM start_time),
         EXTRACT(DAY FROM start_time),
         EXTRACT(WEEK FROM start_time),
@@ -259,7 +259,8 @@ time_table_insert = ("""
     FROM (SELECT
             TIMESTAMP 'epoch' + ts/1000*INTERVAL '1 second' AS start_time
         FROM staging_events
-            WHERE ts IS NOT NULL) sub;
+            WHERE ts IS NOT NULL) sub
+    WHERE start_time NOT IN (SELECT DISTINCT start_time FROM time);
 """)
 
 # The above subquery transforms a BIGINT into a TIMESTAMP.
